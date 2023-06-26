@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Rock Groups</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <style>
+        .header {
+            text-align: center;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+
+    class SongCard extends React.Component {
+      render() {
+        return (
+          <div className='col-2 text-center border border-secondary rounded p-2 m-3'>
+            <img src={this.props.song.poster} className="w-75 h-50 object-fit-cover" />
+            <p className='fs-2'>{this.props.song.title}</p>
+            <h1 className='text-primary'>{this.props.song.rating.toFixed(1)}</h1>
+          </div>
+        );
+      }
+    }
+
+
+    class MyApp extends React.Component {
+      
+      constructor(props) {
+        super(props);
+        this.state = { 
+          title: 'My Favourite Songs',
+          songs: [
+            
+          ],
+        };
+       }
+
+      getCars = () => {
+        if (this.state.songs.length > 0) {
+          var cards_list = this.state.songs.map(
+          (song, index) => {
+            return <SongCard 
+              song={song} 
+              key={index}
+            />
+          }
+        );
+        return cards_list;
+        } else {
+          return <h2>Sorry, no songs...</h2>
+        }
+      }
+
+      componentDidMount() {
+        setTimeout(this.getAPIData, 1000);
+      }
+
+      getAPIData = async () => {
+        console.log('getAPIData');
+        const URL = 'http://127.0.0.1:8000/api/song/list/';
+        const apiURL = await fetch(URL, {
+          method: "GET",
+          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" }
+        });
+        const data = await apiURL.json();
+        console.log(data);
+        this.setState({
+          songs: data,
+        });
+      }
+      
+      render() {
+        return (
+            <>
+                <h1 className='header'>Rock Groups React</h1>
+                <div className='row px-3'>
+                  {
+                  this.getCars()
+                  }
+                </div>
+            </>
+        );
+      }
+    }
+
+    const container = document.getElementById('root');
+    const root = ReactDOM.createRoot(container);
+    root.render(<MyApp />);
+
+    </script>
+</body>
+
+</html>
